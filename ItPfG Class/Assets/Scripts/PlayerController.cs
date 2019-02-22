@@ -42,12 +42,14 @@ public class PlayerController : MonoBehaviour
 		//If we're hitting keys we move in that direction
 		if (Input.GetKey(KeyCode.RightArrow))
 		{
-			transform.position += new Vector3(0.2f,0,0);
+			RB.AddForce(new Vector2(10,0));
+//			transform.position += new Vector3(0.2f,0,0);
 //			vel.x = Speed;
 		}
 		else if (Input.GetKey(KeyCode.LeftArrow))
 		{
-			transform.position += new Vector3(-0.2f,0,0);
+			RB.AddForce(new Vector2(-10,0),ForceMode2D.Force);
+//			transform.position += new Vector3(-0.2f,0,0);
 //			vel.x = -Speed;
 		}
 //		else //If we're not hitting keys, come to stop
@@ -56,9 +58,10 @@ public class PlayerController : MonoBehaviour
 //		}
 
 		//Jump, but only if you're touching the ground
-		if (Input.GetKey(KeyCode.UpArrow) )//&& OnGround()
+		if (Input.GetKeyDown(KeyCode.UpArrow) )//&& OnGround()
 		{
-			transform.position += new Vector3(0,0.2f,0);
+			RB.AddForce(new Vector2(0,10),ForceMode2D.Impulse);
+//			transform.position += new Vector3(0,0.2f,0);
 //			vel.y = JumpPower;
 			//AS.PlayOneShot(Hop);
 //			Particles.Emit(10);
