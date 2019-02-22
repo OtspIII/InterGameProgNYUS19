@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour
 	public AudioClip Hop;
 	public SpriteRenderer SR;
 	public Transform Body;
+	public Collider2D Collider;
+
+	private float JumpTime;
+	private float CoyoteTime;
 
 
 	void Start()
@@ -27,6 +31,7 @@ public class PlayerController : MonoBehaviour
 		//Find our rigidbody and audio right at the start
 		RB = GetComponent<Rigidbody2D>();
 		AS = GetComponent<AudioSource>();
+		Collider = GetComponent<Collider2D>();
 	}
 
 
@@ -63,14 +68,28 @@ public class PlayerController : MonoBehaviour
 
 		vel.x = Mathf.Lerp(vel.x, xDesire, 0.3f);
 
+		if (OnGround())
+		{
+			JumpTime = 0;
+			CoyoteTime = 0;
+		}
+		else
+		{
+			CoyoteTime += Time.deltaTime;
+			JumpTime += Time.deltaTime;
+			if (!Input.GetKey(KeyCode.UpArrow))
+				JumpTime = 999;
+		}
+
 		//Jump, but only if you're touching the ground
-		if (Input.GetKeyDown(KeyCode.UpArrow) )//&& OnGround()
+		if (Input.GetKey(KeyCode.UpArrow) && (OnGround() || JumpTime < 0.3f || CoyoteTime < 0.15f))
 		{
 //			RB.AddForce(new Vector2(0,10),ForceMode2D.Impulse);
 //			transform.position += new Vector3(0,0.2f,0);
 			vel.y = JumpPower;
+			CoyoteTime = 999;
 			//AS.PlayOneShot(Hop);
-			Particles.Emit(10);
+//			Particles.Emit(10);
 		}
 
 		float move = Mathf.Min(0.5f,vel.magnitude / 8f);
@@ -82,7 +101,13 @@ public class PlayerController : MonoBehaviour
 	
 	public bool OnGround()
 	{
-		return Touching.Count > 0;
+		Vector2 bottomLeft = (Vector2)(Collider.bounds.center) + new Vector2(-Collider.bounds.extents.x + 0.01f,
+			                     -Collider.bounds.extents.y);
+		Vector2 right = (Vector2)(Collider.bounds.center) + new Vector2(Collider.bounds.extents.x - 0.01f,
+			                -Collider.bounds.extents.y - 0.01f);
+		Collider2D r = Physics2D.OverlapArea(bottomLeft, right, LayerMask.GetMask("Floor"));
+		return r;
+
 	}
 
 
