@@ -38,34 +38,37 @@ public class PlayerController : MonoBehaviour
 	void Inputs()
 	{
 		//Pull out our old velocity so we can modify it
-		Vector3 vel = RB.velocity;
+//		Vector3 vel = RB.velocity;
 		//If we're hitting keys we move in that direction
 		if (Input.GetKey(KeyCode.RightArrow))
 		{
-			vel.x = Speed;
+			transform.position += new Vector3(0.2f,0,0);
+//			vel.x = Speed;
 		}
 		else if (Input.GetKey(KeyCode.LeftArrow))
 		{
-			vel.x = -Speed;
+			transform.position += new Vector3(-0.2f,0,0);
+//			vel.x = -Speed;
 		}
-		else //If we're not hitting keys, come to stop
-		{
-			vel.x = 0;
-		}
+//		else //If we're not hitting keys, come to stop
+//		{
+//			vel.x = 0;
+//		}
 
 		//Jump, but only if you're touching the ground
-		if (Input.GetKeyDown(KeyCode.UpArrow) && OnGround())
+		if (Input.GetKey(KeyCode.UpArrow) )//&& OnGround()
 		{
-			vel.y = JumpPower;
+			transform.position += new Vector3(0,0.2f,0);
+//			vel.y = JumpPower;
 			//AS.PlayOneShot(Hop);
-			Particles.Emit(10);
+//			Particles.Emit(10);
 		}
 
-		float move = Mathf.Min(0.5f,vel.magnitude / 8f);
-		Body.transform.localScale = new Vector3(1 - move, 1 + move,1);
+//		float move = Mathf.Min(0.5f,vel.magnitude / 8f);
+//		Body.transform.localScale = new Vector3(1 - move, 1 + move,1);
 
 		//Okay, we've modified our velocity enough--plug it back into the rigidbody
-		RB.velocity = vel;
+//		RB.velocity = vel;
 	}
 	
 	public bool OnGround()
