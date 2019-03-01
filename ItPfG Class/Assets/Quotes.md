@@ -7,3 +7,4 @@ put a + and a space in front of your quote to make it a bullet point list item o
 + Carsen: "NullReferenceException: Object reference not set to an instance of an object" -- Unity
 + Max: "You're doing great!"
 +Edgar : "Mind Transfer Jutsu!" - Ino Yamanaka
++ Justin: "I wasn't here for the lesson so I have no idea how to use github" - Justin
