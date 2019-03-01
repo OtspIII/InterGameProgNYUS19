@@ -5,8 +5,8 @@ using UnityEngine;
 public class WorldThing : MonoBehaviour
 {
     public TileThing Location;
-    public WorldThing.Types Type;
-    public SpriteRenderer Body;
+    public Types Type;
+    protected SpriteRenderer Body;
     
     //I put all my Start/Update code in virtual functions so they can be messed with more easily by children
     void Start()
@@ -33,6 +33,8 @@ public class WorldThing : MonoBehaviour
     public virtual void Setup(TileThing start)
     {
         SetLocation(start);
+//        if (!GSM.AllThings.Contains(this))
+//            GSM.AllThings.Add(this);
     }
 
     //When I'm destroyed make sure I destroy myself safely
@@ -70,6 +72,27 @@ public class WorldThing : MonoBehaviour
     {
         //By default let's just say that if you try to enter this square nothing happens and you can't get in
         return false;
+    }
+
+    //Move to a position relative to your current location
+    public void Move(int x, int y)
+    {
+        //Neighbor() asks the tile what the tile is relative to them with an x any offset
+        TileThing target = Location.Neighbor(x, y);
+        Move(target);
+    }
+    
+    //If I try to move to a tile, run the bump code on each object in the area and if none stop me move there
+    public void Move(TileThing target)
+    {
+        if (target == null)
+            return;
+        bool canMove = true;
+        foreach (WorldThing w in target.Contents)
+            if (!w.GetBumped(this))
+                canMove = false;
+        if (canMove)
+            SetLocation(target);
     }
 
     public enum Types

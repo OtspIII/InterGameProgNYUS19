@@ -6,14 +6,13 @@ public class ScoreThing : WorldThing
 {
     public override bool GetBumped(WorldThing bumper)
     {
-        //If you enter the door, you load the new scene
+        //If you stand on the score thing you get a point
         if (bumper.Type == Types.Player)
         {
             Despawn();
             //GSM.ChangeScore(1);
             return false;
         }
-
-        return true;
+        return false;
     }
 }
