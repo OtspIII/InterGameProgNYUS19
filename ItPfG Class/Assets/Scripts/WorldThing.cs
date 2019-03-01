@@ -33,8 +33,8 @@ public class WorldThing : MonoBehaviour
     public virtual void Setup(TileThing start)
     {
         SetLocation(start);
-//        if (!GSM.AllThings.Contains(this))
-//            GSM.AllThings.Add(this);
+        if (!God.GSM.AllThings.Contains(this))
+            God.GSM.AllThings.Add(this);
     }
 
     //When I'm destroyed make sure I destroy myself safely
@@ -43,6 +43,7 @@ public class WorldThing : MonoBehaviour
         if (Location != null)
             LeaveTile(Location);
         Destroy(gameObject);
+        God.GSM.AllThings.Remove(this);
     }
     
     //This code is responsible for making a WT safely leave its old tile and join its new tile

@@ -8,13 +8,44 @@ public class GSM : MonoBehaviour
     public Camera Cam;
     public TextMeshPro Text;
     public TextMeshPro ScoreTxt;
-    public int Score = 0;
-    public List<WorldThing> AllThings;//This doesn't work yet
+    public int Score
+    {
+        get { return ScoreManager.Score; }
+        set { ScoreManager.Score = value; }
+    }
+    public List<WorldThing> AllThings;
     public List<TileThing> AllTiles;
-    public Dictionary<int, Dictionary<int, TileThing>> Tiles = new Dictionary<int, Dictionary<int, TileThing>>(); 
+    public Dictionary<int, Dictionary<int, TileThing>> Tiles = new Dictionary<int, Dictionary<int, TileThing>>();
 
+    
+    void Awake()
+    {
+        God.GSM = this;
+    }
+    
     void Start()
     {
+        for (int x = -GameSettings.MapSizeX /2; x <= GameSettings.MapSizeX /2; x++)
+        {
+            for (int y = -GameSettings.MapSizeY /2; y <= GameSettings.MapSizeY /2; y++)
+            {
+                God.Library.SpawnTile(x, y);
+            }
+        }
+
+        List<TileThing> openTiles = new List<TileThing>();
+        openTiles.AddRange(AllTiles);
+        foreach (WorldThing.Types t in GameSettings.MapContents)
+        {
+            if (openTiles.Count == 0)
+                break;
+            TileThing rand = openTiles[Random.Range(0, openTiles.Count)];
+            openTiles.Remove(rand);
+            God.Library.SpawnThing(t, rand);
+        }
+
+        
+
         ChangeScore(0);
     }
     

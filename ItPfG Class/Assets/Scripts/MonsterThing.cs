@@ -8,6 +8,8 @@ public class MonsterThing : WorldThing
     protected override void OnStart()
     {
         base.OnStart();
+        MTypes species = MonsterTypes[Random.Range(0, MonsterTypes.Count)];
+        Body.sprite = God.Library.GetMonster(species);
     }
 
     public override bool GetBumped(WorldThing bumper)
@@ -16,7 +18,7 @@ public class MonsterThing : WorldThing
         if (bumper.Type == Types.Player)
         {
             bumper.Despawn();
-            //GSM.SetText("You Died");
+            God.GSM.SetText("You Died");
             return false;
         }
 
@@ -25,26 +27,20 @@ public class MonsterThing : WorldThing
 
     
 
-//    public List<MTypes> MonsterTypes = new List<MTypes> { MTypes.Skeleton, MTypes.Demon, MTypes.Dragon, MTypes.Bear,
-//        MTypes.Goblin, MTypes.Werewolf, MTypes.GiantSpider };
-//
-//    public enum MTypes
-//    {
-//        None=0,
-//        Skeleton=1,
-//        Demon=2,
-//        Dragon=3,
-//        Bear=4,
-//        Goblin=5,
-//        Werewolf=6,
-//        GiantSpider=7
-//    }
+    public List<MTypes> MonsterTypes = new List<MTypes> { MTypes.Skeleton, MTypes.Demon, MTypes.Dragon, MTypes.Bear,
+        MTypes.Goblin, MTypes.Werewolf, MTypes.GiantSpider };
 
-//This is just here as a reminder/shortcut for me
-//    Sprite[] res = Resources.LoadAll<Sprite> ("Characters");
-//        foreach (Sprite s in res) {
-//        MonsterThing.MTypes t = (MonsterThing.MTypes)System.Enum.Parse(typeof(MonsterThing.MTypes), s.name);
-//        Monsters.Add (t, s);
-//    }
+    public enum MTypes
+    {
+        None=0,
+        Skeleton=1,
+        Demon=2,
+        Dragon=3,
+        Bear=4,
+        Goblin=5,
+        Werewolf=6,
+        GiantSpider=7
+    }
+
 
 }

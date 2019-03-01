@@ -10,7 +10,7 @@ public class ScoreThing : WorldThing
         if (bumper.Type == Types.Player)
         {
             Despawn();
-            //GSM.ChangeScore(1);
+            God.GSM.ChangeScore(1);
             return true;
         }
         return true;
