@@ -8,3 +8,4 @@ put a + and a space in front of your quote to make it a bullet point list item o
 + Max: "You're doing great!"
 +Edgar : "Mind Transfer Jutsu!" - Ino Yamanaka
 + Justin: "I wasn't here for the lesson so I have no idea how to use github" - Justin
++ Arjun: "I will take responsibility for what I have done. If I must fall, I will rise each time a better man." – Dalinar Kholin
