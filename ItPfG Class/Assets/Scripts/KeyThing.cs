@@ -12,8 +12,8 @@ public class KeyThing : WorldThing
             ((PlayerThing) bumper).HasKey = true;
             LeaveTile(Location);
             transform.SetParent(bumper.transform);
-            transform.localPosition = new Vector3(0.5f,0.5f,-0.1f);
-            transform.localScale = new Vector3(0.25f,0.25f,1);
+            transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
+            transform.localScale = new Vector3(0.5f,0.5f,1);
             return true;
         }
 

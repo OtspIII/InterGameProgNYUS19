@@ -5,9 +5,14 @@ using UnityEngine.Networking;
 
 public class MonsterThing : WorldThing
 {
+    protected override void OnStart()
+    {
+        base.OnStart();
+    }
+
     public override bool GetBumped(WorldThing bumper)
     {
-        //Bump into a skeleton and you die
+        //Bump into a monster and you die
         if (bumper.Type == Types.Player)
         {
             bumper.Despawn();
@@ -18,14 +23,10 @@ public class MonsterThing : WorldThing
         return base.GetBumped(bumper);
     }
 
-    public override void Setup(TileThing start)
-    {
-        base.Setup(start);
-        
-    }
+    
 
 //    public List<MTypes> MonsterTypes = new List<MTypes> { MTypes.Skeleton, MTypes.Demon, MTypes.Dragon, MTypes.Bear,
-//        MTypes.Goblin, MTypes.Werewolf };
+//        MTypes.Goblin, MTypes.Werewolf, MTypes.GiantSpider };
 //
 //    public enum MTypes
 //    {
@@ -35,14 +36,15 @@ public class MonsterThing : WorldThing
 //        Dragon=3,
 //        Bear=4,
 //        Goblin=5,
-//        Werewolf=6
+//        Werewolf=6,
+//        GiantSpider=7
 //    }
 
 //This is just here as a reminder/shortcut for me
-//    object[] res = Resources.LoadAll ("Characters", typeof(Sprite));
-//        foreach (object o in res) {
-//        Sprite s = (Sprite)o;
+//    Sprite[] res = Resources.LoadAll<Sprite> ("Characters");
+//        foreach (Sprite s in res) {
 //        MonsterThing.MTypes t = (MonsterThing.MTypes)System.Enum.Parse(typeof(MonsterThing.MTypes), s.name);
 //        Monsters.Add (t, s);
 //    }
+
 }

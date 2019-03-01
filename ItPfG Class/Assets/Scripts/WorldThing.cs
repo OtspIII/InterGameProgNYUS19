@@ -88,7 +88,10 @@ public class WorldThing : MonoBehaviour
         if (target == null)
             return;
         bool canMove = true;
-        foreach (WorldThing w in target.Contents)
+        //Gotta make a temp list because there's a chance I change the contents of the square by bumping
+        List<WorldThing> temp = new List<WorldThing>();
+        temp.AddRange(target.Contents);
+        foreach (WorldThing w in temp)
             if (!w.GetBumped(this))
                 canMove = false;
         if (canMove)

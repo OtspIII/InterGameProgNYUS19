@@ -11,8 +11,8 @@ public class ScoreThing : WorldThing
         {
             Despawn();
             //GSM.ChangeScore(1);
-            return false;
+            return true;
         }
-        return false;
+        return true;
     }
 }
