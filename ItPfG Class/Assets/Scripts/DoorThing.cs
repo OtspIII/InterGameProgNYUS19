@@ -1,18 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class DoorThing : MonoBehaviour
+public class DoorThing : WorldThing
 {
-    // Start is called before the first frame update
-    void Start()
+    public override bool GetBumped(WorldThing bumper)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //If you enter the door and you have the key, reload the scene
+        if (bumper.Type == Types.Player && ((PlayerThing)bumper).HasKey)
+        {
+            SceneManager.LoadScene("Game");
+            return true;
+        }
+        return base.GetBumped(bumper);
     }
 }

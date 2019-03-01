@@ -5,6 +5,8 @@ using UnityEngine;
 public class WorldThing : MonoBehaviour
 {
     public TileThing Location;
+    public WorldThing.Types Type;
+    public SpriteRenderer Body;
     
     //I put all my Start/Update code in virtual functions so they can be messed with more easily by children
     void Start()
@@ -19,7 +21,7 @@ public class WorldThing : MonoBehaviour
 
     protected virtual void OnStart()
     {
-
+        Body = transform.Find("Body").GetComponent<SpriteRenderer>();
     }
 
     protected virtual void OnUpdate()
@@ -44,6 +46,7 @@ public class WorldThing : MonoBehaviour
     //This code is responsible for making a WT safely leave its old tile and join its new tile
     //Tiles keep track of what objects are in them
     //Also physically move to the tile
+    //Note that this does no checks to see if a square is a valid place to go--that's in the Move function
     public void SetLocation(TileThing tile)
     {
         if (Location != null)
@@ -61,6 +64,23 @@ public class WorldThing : MonoBehaviour
         tile.Contents.Remove(this);
     }
 
-    
+    //When the player (or something else) tries to enter a square containing this, run this function
+    //The return bool is whether you let the player enter or not. On a true the player can enter, on a false they can't
+    public virtual bool GetBumped(WorldThing bumper)
+    {
+        //By default let's just say that if you try to enter this square nothing happens and you can't get in
+        return false;
+    }
+
+    public enum Types
+    {
+        None=0,
+        Player=1,
+        Wall=2,
+        Skeleton=3,
+        ScoreThing=4,
+        MagicDoor=5,
+        RedKey=6
+    }
 
 }

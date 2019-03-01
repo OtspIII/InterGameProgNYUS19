@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkeletonThing : MonoBehaviour
+public class SkeletonThing : WorldThing
 {
-    // Start is called before the first frame update
-    void Start()
+    public override bool GetBumped(WorldThing bumper)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //If you enter the door, you load the new scene
+        if (bumper.Type == Types.Player)
+        {
+            bumper.Despawn();
+            //GSM.SetText("You Died");
+            return false;
+        }
+        return base.GetBumped(bumper);
     }
 }
