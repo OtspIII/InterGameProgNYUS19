@@ -21,6 +21,7 @@ public class MonsterThing : WorldThing
             God.GSM.SetText("You Died");
             return false;
         }
+        //hello
 
         return base.GetBumped(bumper);
     }
