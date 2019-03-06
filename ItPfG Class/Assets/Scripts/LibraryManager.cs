@@ -7,19 +7,13 @@ public class LibraryManager : MonoBehaviour
     public TileThing TileP;
     public List<SpawnableEntry> AllWTs;
     Dictionary<WorldThing.Types,WorldThing> ThingDict = new Dictionary<WorldThing.Types, WorldThing>();
-    Dictionary<MonsterThing.MTypes,Sprite> Monsters = new Dictionary<MonsterThing.MTypes, Sprite>();
+    public List<MonsterType> Monsters;
 
     void Awake()
     {
         God.Library = this;
         foreach (SpawnableEntry se in AllWTs)
             ThingDict.Add(se.A,se.B);
-        Sprite[] res = Resources.LoadAll<Sprite> ("Characters");
-        foreach (Sprite s in res) {
-            MonsterThing.MTypes t = (MonsterThing.MTypes)System.Enum.Parse(typeof(MonsterThing.MTypes), s.name);
-            Monsters.Add (t, s);
-        }
-
     }
     
     public TileThing SpawnTile(int x, int y)
@@ -38,11 +32,9 @@ public class LibraryManager : MonoBehaviour
         return r;
     }
 
-    public Sprite GetMonster(MonsterThing.MTypes t)
+    public MonsterType GetRandomMonster()
     {
-        if (!Monsters.ContainsKey(t))
-            return null;
-        return Monsters[t];
+        return Monsters[Random.Range(0, Monsters.Count)];
     }
 }
 

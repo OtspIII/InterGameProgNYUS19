@@ -5,43 +5,26 @@ using UnityEngine.Networking;
 
 public class MonsterThing : WorldThing
 {
+    public MonsterType Species;
+    
     protected override void OnStart()
     {
         base.OnStart();
-        MTypes species = MonsterTypes[Random.Range(0, MonsterTypes.Count)];
-        Body.sprite = God.Library.GetMonster(species);
+        Species = God.Library.GetRandomMonster();
+        Body.sprite = Species.S;
     }
 
     public override bool GetBumped(WorldThing bumper)
     {
-        //Bump into a monster and you die
+        //Bump into a monster and kill it but take damage
         if (bumper.Type == Types.Player)
         {
-            bumper.Despawn();
-            God.GSM.SetText("You Died");
-            return false;
+            
+            God.GSM.TakeDamage(Species.Damage);
+            Despawn();
+            return true;
         }
-        //hello
 
         return base.GetBumped(bumper);
     }
-
-    
-
-    public List<MTypes> MonsterTypes = new List<MTypes> { MTypes.Skeleton, MTypes.Demon, MTypes.Dragon, MTypes.Bear,
-        MTypes.Goblin, MTypes.Werewolf, MTypes.GiantSpider };
-
-    public enum MTypes
-    {
-        None=0,
-        Skeleton=1,
-        Demon=2,
-        Dragon=3,
-        Bear=4,
-        Goblin=5,
-        Werewolf=6,
-        GiantSpider=7
-    }
-
-
 }

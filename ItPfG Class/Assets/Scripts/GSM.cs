@@ -13,6 +13,11 @@ public class GSM : MonoBehaviour
         get { return ScoreManager.Score; }
         set { ScoreManager.Score = value; }
     }
+    public int HP
+    {
+        get { return ScoreManager.HP; }
+        set { ScoreManager.HP = value; }
+    }
     public List<WorldThing> AllThings;
     public List<TileThing> AllTiles;
     public Dictionary<int, Dictionary<int, TileThing>> Tiles = new Dictionary<int, Dictionary<int, TileThing>>();
@@ -59,7 +64,25 @@ public class GSM : MonoBehaviour
     public void ChangeScore(int amt)
     {
         Score += amt;
-        ScoreTxt.text = "Score: " + Score;
+        UpdateText();
+    }
+    
+    //Makes
+    public void TakeDamage(int amt)
+    {
+        HP -= amt;
+        if (HP <= 0)
+        {
+            HP = 0;
+            GetThings(WorldThing.Types.Player)[0].Despawn();
+            God.GSM.SetText("You Died");
+        }
+        UpdateText();
+    }
+
+    void UpdateText()
+    {
+        ScoreTxt.text = "Score: " + Score + "\n" + "HP: " + HP;
     }
 
     //I can get a list of all the TYPE of a thing to exist.
