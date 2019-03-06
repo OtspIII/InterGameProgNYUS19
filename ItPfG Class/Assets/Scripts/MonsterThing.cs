@@ -14,7 +14,7 @@ public class MonsterThing : WorldThing
         Body.sprite = Species.S;
     }
 
-    public override bool GetBumped(WorldThing bumper)
+    public override IEnumerator GetBumped(WorldThing bumper)
     {
         //Bump into a monster and kill it but take damage
         if (bumper.Type == Types.Player)
@@ -22,9 +22,7 @@ public class MonsterThing : WorldThing
             
             God.GSM.TakeDamage(Species.Damage);
             Despawn();
-            return true;
+            yield return null;
         }
-
-        return base.GetBumped(bumper);
     }
 }

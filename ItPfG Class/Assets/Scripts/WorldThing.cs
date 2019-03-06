@@ -55,8 +55,9 @@ public class WorldThing : MonoBehaviour
         if (Location != null)
             LeaveTile(Location);
         Location = tile;
-        if (!Location.Contents.Contains(this))
-            Location.Contents.Add(this);
+        if (Location.Contents != null && Location.Contents != this)
+            Debug.Log("I just orphaned a world thing at location " + tile.X + " / " + tile.Y);
+        Location.Contents = this;
         transform.SetParent(Location.transform);
         transform.localPosition = Vector3.zero;
     }
@@ -64,15 +65,17 @@ public class WorldThing : MonoBehaviour
     //When you leave a tile remove yourself from its contents
     public void LeaveTile(TileThing tile)
     {
-        tile.Contents.Remove(this);
+        if (tile.Contents == this)
+            tile.Contents =  null;
+        transform.position = new Vector3(999,999,-999);
     }
 
     //When the player (or something else) tries to enter a square containing this, run this function
     //The return bool is whether you let the player enter or not. On a true the player can enter, on a false they can't
-    public virtual bool GetBumped(WorldThing bumper)
+    public virtual IEnumerator GetBumped(WorldThing bumper)
     {
         //By default let's just say that if you try to enter this square nothing happens and you can't get in
-        return false;
+        yield return null;
     }
 
     //Move to a position relative to your current location
@@ -83,20 +86,21 @@ public class WorldThing : MonoBehaviour
         Move(target);
     }
     
-    //If I try to move to a tile, run the bump code on each object in the area and if none stop me move there
+    //If I try to move to a tile, run the bump code on any object in the area and if none stop me move there
     public void Move(TileThing target)
     {
         if (target == null)
             return;
-        bool canMove = true;
-        //Gotta make a temp list because there's a chance I change the contents of the square by bumping
-        List<WorldThing> temp = new List<WorldThing>();
-        temp.AddRange(target.Contents);
-        foreach (WorldThing w in temp)
-            if (!w.GetBumped(this))
-                canMove = false;
-        if (canMove)
-            SetLocation(target);
+        if (target.Contents != null)
+            StartCoroutine(target.Contents.GetBumped(this));
+        else
+            StartCoroutine(Walk(target));
+    }
+
+    public IEnumerator Walk(TileThing target)
+    {
+        SetLocation(target);
+        yield return null;
     }
 
     public enum Types

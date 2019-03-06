@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class IM 
+public static class IM
 {
+
+    public static bool CanAct = true;
+    
     public static bool Pressed(Inputs i)
     {
+        if (!IM.CanAct)
+            return false;
+        
         switch (i)
         {
             case Inputs.Up:

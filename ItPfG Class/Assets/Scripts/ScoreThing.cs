@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class ScoreThing : WorldThing
 {
-    public override bool GetBumped(WorldThing bumper)
+    public override IEnumerator GetBumped(WorldThing bumper)
     {
         //If you stand on the score thing you get a point
         if (bumper.Type == Types.Player)
         {
+            TileThing loc = Location;
             Despawn();
             God.GSM.ChangeScore(1);
-            return true;
+            yield return StartCoroutine(bumper.Walk(loc));//This is going to throw an error eventually!
         }
-        return true;
     }
 }

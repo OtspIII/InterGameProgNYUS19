@@ -30,6 +30,12 @@ public class GSM : MonoBehaviour
     
     void Start()
     {
+        BuildWorld();
+        ChangeScore(0);
+    }
+
+    void BuildWorld()
+    {
         for (int x = -GameSettings.MapSizeX /2; x <= GameSettings.MapSizeX /2; x++)
         {
             for (int y = -GameSettings.MapSizeY /2; y <= GameSettings.MapSizeY /2; y++)
@@ -48,10 +54,6 @@ public class GSM : MonoBehaviour
             openTiles.Remove(rand);
             God.Library.SpawnThing(t, rand);
         }
-
-        
-
-        ChangeScore(0);
     }
     
     //I can update the big screen covering text with this
