@@ -155,7 +155,9 @@ MonoBehaviour:
     B: {fileID: 2865732331797622217, guid: 71077baca55fc46d080800256c066f46, type: 3}
   - A: 6
     B: {fileID: 2476319023062901260, guid: d8f5dbd3a05754b3a949387d7e50cf5a, type: 3}
-  Monsters: []
+  Monsters:
+  - {fileID: 11400000, guid: 3fb164b6a9ed342bcb8f7d8dbe46475e, type: 2}
+  - {fileID: 11400000, guid: 6530e45c5309247d7a67a5b370149d26, type: 2}
 --- !u!4 &1011251552
 Transform:
   m_ObjectHideFlags: 0
@@ -201,6 +203,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MapSize: {x: 10, y: 8}
   MapContents: 010000000500000006000000040000000400000003000000030000000200000002000000
+  n: 0
 --- !u!4 &1220017443
 Transform:
   m_ObjectHideFlags: 0

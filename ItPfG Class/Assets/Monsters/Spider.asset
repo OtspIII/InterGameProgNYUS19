@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea087a3997ab4ff8aac69235a71a66a, type: 3}
   m_Name: Spider
   m_EditorClassIdentifier: 
-  Type: 0
-  S: {fileID: 0}
-  Damage: 0
+  Type: 7
+  S: {fileID: 21300000, guid: baf1d8e7b7d864eca8855ac1afeafffa, type: 3}
+  Damage: 2

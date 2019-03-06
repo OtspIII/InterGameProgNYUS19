@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea087a3997ab4ff8aac69235a71a66a, type: 3}
   m_Name: Skeleton
   m_EditorClassIdentifier: 
-  Type: 0
-  S: {fileID: 0}
-  Damage: 0
+  Type: 1
+  S: {fileID: 21300000, guid: 5263c53e45dcd4ceb991e77b1151f71c, type: 3}
+  Damage: 1

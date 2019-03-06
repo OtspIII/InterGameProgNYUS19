@@ -6,6 +6,7 @@ public class SettingsManager : MonoBehaviour
 {
     public Vector2 MapSize;
     public List<WorldThing.Types> MapContents;
+    [SerializeField]private int n;
 
     void Awake()
     {
