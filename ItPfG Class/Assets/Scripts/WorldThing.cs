@@ -92,15 +92,26 @@ public class WorldThing : MonoBehaviour
         if (target == null)
             return;
         if (target.Contents != null)
-            StartCoroutine(target.Contents.GetBumped(this));
+            StartCoroutine(PlayAnim(target.Contents.GetBumped(this)));
         else
-            StartCoroutine(Walk(target));
+            StartCoroutine(PlayAnim(Walk(target)));
     }
 
+    public IEnumerator PlayAnim(IEnumerator coroutine)
+    {
+        IM.CanAct = false;
+        yield return StartCoroutine(coroutine);
+        IM.CanAct = true;
+    }
+    
     public IEnumerator Walk(TileThing target)
     {
+        while (Vector3.Distance(transform.position, target.transform.position) > 0.05f)
+        {
+            transform.position = Vector3.Lerp(transform.position,target.transform.position,0.1f);
+            yield return null;
+        }
         SetLocation(target);
-        yield return null;
     }
 
     public enum Types

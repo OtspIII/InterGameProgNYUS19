@@ -76,8 +76,8 @@ public class GSM : MonoBehaviour
         if (HP <= 0)
         {
             HP = 0;
-            GetThings(WorldThing.Types.Player)[0].Despawn();
-            //GetThings<PlayerThing>()[0].Despawn();
+            //GetThings(WorldThing.Types.Player)[0].Despawn();
+            GetThings<PlayerThing>()[0].Despawn();
             God.GSM.SetText("You Died");
         }
         UpdateText();

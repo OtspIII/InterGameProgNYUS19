@@ -12,7 +12,7 @@ public class ScoreThing : WorldThing
             TileThing loc = Location;
             Despawn();
             God.GSM.ChangeScore(1);
-            yield return StartCoroutine(bumper.Walk(loc));//This is going to throw an error eventually!
+            yield return God.GSM.StartCoroutine(bumper.Walk(loc));//This is going to throw an error eventually!
         }
     }
 }
