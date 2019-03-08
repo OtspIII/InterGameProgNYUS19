@@ -77,6 +77,7 @@ public class GSM : MonoBehaviour
         {
             HP = 0;
             GetThings(WorldThing.Types.Player)[0].Despawn();
+            //GetThings<PlayerThing>()[0].Despawn();
             God.GSM.SetText("You Died");
         }
         UpdateText();
@@ -96,6 +97,15 @@ public class GSM : MonoBehaviour
         foreach(WorldThing wt in AllThings)
             if (type == WorldThing.Types.None || wt.Type == type)
                 r.Add(wt);
+        return r;
+    }
+    
+    public List<T> GetThings<T>() where T:WorldThing
+    {
+        List<T> r = new List<T>();
+        foreach(WorldThing wt in AllThings)
+            if (wt is T)
+                r.Add((T)wt);
         return r;
     }
 

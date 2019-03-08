@@ -25,9 +25,12 @@ public class LibraryManager : MonoBehaviour
 
     public WorldThing SpawnThing(WorldThing.Types t,TileThing tile)
     {
-        if (!ThingDict.ContainsKey(t))
+        WorldThing prefab = null;
+        if (ThingDict.ContainsKey(t))
+            prefab = ThingDict[t];
+        if (prefab == null)
             return null;
-        WorldThing r = Instantiate(ThingDict[t]).GetComponent<WorldThing>();
+        WorldThing r = Instantiate(prefab).GetComponent<WorldThing>();
         r.Setup(tile);
         return r;
     }
