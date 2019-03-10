@@ -60,6 +60,7 @@ public class WorldThing : MonoBehaviour
         Location.Contents = this;
         transform.SetParent(Location.transform);
         transform.localPosition = Vector3.zero;
+        Debug.Log("SET LOCATION: " + name + " / " + tile.X + "." + tile.Y);
     }
 
     //When you leave a tile remove yourself from its contents
@@ -108,7 +109,7 @@ public class WorldThing : MonoBehaviour
     {
         while (Vector3.Distance(transform.position, target.transform.position) > 0.05f)
         {
-            transform.position = Vector3.Lerp(transform.position,target.transform.position,0.1f);
+            transform.position = Vector3.Lerp(transform.position,target.transform.position,0.3f);
             yield return null;
         }
         SetLocation(target);
