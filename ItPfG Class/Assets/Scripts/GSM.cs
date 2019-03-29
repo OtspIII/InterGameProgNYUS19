@@ -8,26 +8,29 @@ public class GSM : MonoBehaviour
     public Camera Cam;
     public TextMeshPro Text;
     public TextMeshPro ScoreTxt;
+
     public int Score
     {
         get { return ScoreManager.Score; }
         set { ScoreManager.Score = value; }
     }
+
     public int HP
     {
         get { return ScoreManager.HP; }
         set { ScoreManager.HP = value; }
     }
+
     public List<WorldThing> AllThings;
     public List<TileThing> AllTiles;
     public Dictionary<int, Dictionary<int, TileThing>> Tiles = new Dictionary<int, Dictionary<int, TileThing>>();
 
-    
+
     void Awake()
     {
         God.GSM = this;
     }
-    
+
     void Start()
     {
         BuildWorld();

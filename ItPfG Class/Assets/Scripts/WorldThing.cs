@@ -10,36 +10,28 @@ public class WorldThing : MonoBehaviour
     protected SpriteRenderer Body;
     public MonsterType Species;
     public bool HasKey = false;
-    public bool IsPlayer = false;
 
-    public delegate void Bumped(WorldThing b);
-    public Bumped GetBumped;
-
-    void Start()
-    {
-        
-    }
+    //The code for this is all the way at the bottom of this class
+    public List<Trait> Traits = new List<Trait>();
+    public Dictionary<EventType,List<Trait>> Listeners = new Dictionary<EventType, List<Trait>>();
     
     void Update()
     {
-        if (!IsPlayer) //only runs for the player
-            return;
-        //If I hit an arrow key, move in that direction
         if (IM.Pressed(Inputs.Left))
         {
-            Move(-1,0);
+            TakeMsg(new EventMsg(Inputs.Left));
         }
         else if (IM.Pressed(Inputs.Right))
         {
-            Move(1,0);
+            TakeMsg(new EventMsg(Inputs.Right));
         }
         else if (IM.Pressed(Inputs.Up))
         {
-            Move(0,1);
+            TakeMsg(new EventMsg(Inputs.Up));
         }
         else if (IM.Pressed(Inputs.Down))
         {
-            Move(0,-1);
+            TakeMsg(new EventMsg(Inputs.Down));
         }
     }
 
@@ -58,19 +50,19 @@ public class WorldThing : MonoBehaviour
             case Types.Skeleton:
                 Species = God.Library.GetRandomMonster();
                 Body.sprite = Species.S;
-                GetBumped = MonsterBump;
+                AddTrait(new MonsterTrait());
                 break;
             case Types.Player:
-                IsPlayer = true;
+                AddTrait(new PlayerTrait());
                 break;
             case Types.ScoreThing:
-                GetBumped = ScoreBump;
+                AddTrait(new ScoreTrait());
                 break;
             case Types.RedKey:
-                GetBumped = KeyBump;
+                AddTrait(new KeyTrait());
                 break;
             case Types.MagicDoor:
-                GetBumped = DoorBump;
+                AddTrait(new DoorTrait());
                 break;
         }
     }
@@ -80,7 +72,7 @@ public class WorldThing : MonoBehaviour
     {
         if (Location != null)
             LeaveTile(Location);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
         God.GSM.AllThings.Remove(this);
     }
     
@@ -130,7 +122,10 @@ public class WorldThing : MonoBehaviour
         if (target == null)
             return;
         if (target.Contents != null)
-            target.Contents.GetBumped(this);
+        {
+            EventMsg bumpMsg = new EventMsg(EventType.GetBumped,this);
+            target.Contents.TakeMsg(bumpMsg);
+        }
         else
             SetLocation(target);
     }
@@ -145,54 +140,23 @@ public class WorldThing : MonoBehaviour
         MagicDoor=5,
         RedKey=6
     }
-    
-    public void DoorBump(WorldThing bumper)
+
+    public void AddTrait(Trait t)
     {
-        //If you enter the door and you have the key, reload the scene
-        if (bumper.Type == Types.Player && bumper.HasKey)
+        Traits.Add(t);
+        foreach (EventType e in t.ListenFor)
         {
-            TileThing loc = Location;
-            Location.Contents = null;
-            bumper.SetLocation(loc);
-            SceneManager.LoadScene("Game");
-        }
-    }
-    
-    public void KeyBump(WorldThing bumper)
-    {
-        //If you touch this, you get a key! And the key goes on top of you
-        if (bumper.Type == Types.Player)
-        {
-            TileThing loc = Location;
-            bumper.HasKey = true;
-            LeaveTile(Location);
-            transform.SetParent(bumper.transform);
-            transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
-            transform.localScale = new Vector3(0.5f,0.5f,1);
-            bumper.SetLocation(loc);
-        }
-    }
-    
-    public void MonsterBump(WorldThing bumper)
-    {
-        //Bump into a monster and kill it but take damage
-        if (bumper.Type == Types.Player)
-        {
-            God.GSM.TakeDamage(Species.Damage);
-            Despawn();
-        }
-    }
-    
-    public void ScoreBump(WorldThing bumper)
-    {
-        //If you stand on the score thing you get a point
-        if (bumper.Type == Types.Player)
-        {
-            TileThing loc = Location;
-            Despawn();
-            God.GSM.ChangeScore(1);
-            bumper.SetLocation(loc);
+            if (!Listeners.ContainsKey(e))
+                Listeners.Add(e,new List<Trait>());
+            Listeners[e].Add(t);
         }
     }
 
+    public void TakeMsg(EventMsg msg)
+    {
+        if (!Listeners.ContainsKey(msg.Type))
+            return;
+        foreach(Trait t in Listeners[msg.Type])
+            t.TakeMsg(this,msg);
+    }
 }
