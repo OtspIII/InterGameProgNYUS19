@@ -1,44 +1,82 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WorldThing : MonoBehaviour
 {
     public TileThing Location;
     public Types Type;
     protected SpriteRenderer Body;
-    
-    //I put all my Start/Update code in virtual functions so they can be messed with more easily by children
+    public MonsterType Species;
+    public bool HasKey = false;
+    public bool IsPlayer = false;
+
+    public delegate void Bumped(WorldThing b);
+    public Bumped GetBumped;
+
     void Start()
     {
-        OnStart();
+        
     }
-
+    
     void Update()
     {
-        OnUpdate();
-    }
-
-    protected virtual void OnStart()
-    {
-        Body = transform.Find("Body").GetComponent<SpriteRenderer>();
-    }
-
-    protected virtual void OnUpdate()
-    {
-
+        if (!IsPlayer) //only runs for the player
+            return;
+        //If I hit an arrow key, move in that direction
+        if (IM.Pressed(Inputs.Left))
+        {
+            Move(-1,0);
+        }
+        else if (IM.Pressed(Inputs.Right))
+        {
+            Move(1,0);
+        }
+        else if (IM.Pressed(Inputs.Up))
+        {
+            Move(0,1);
+        }
+        else if (IM.Pressed(Inputs.Down))
+        {
+            Move(0,-1);
+        }
     }
 
     //When I first spawn a world thing I need to run setup on it so that it does basic stuff like place itself
-    public virtual void Setup(TileThing start)
+    public void Setup(TileThing start,Types type)
     {
+        Body = transform.Find("Body").GetComponent<SpriteRenderer>();
+        Type = type;
+        gameObject.name = Type.ToString();
         SetLocation(start);
         if (!God.GSM.AllThings.Contains(this))
             God.GSM.AllThings.Add(this);
+        Body.sprite = God.Library.GetSprite(type);
+        switch (type)
+        {
+            case Types.Skeleton:
+                Species = God.Library.GetRandomMonster();
+                Body.sprite = Species.S;
+                GetBumped = MonsterBump;
+                break;
+            case Types.Player:
+                IsPlayer = true;
+                break;
+            case Types.ScoreThing:
+                GetBumped = ScoreBump;
+                break;
+            case Types.RedKey:
+                GetBumped = KeyBump;
+                break;
+            case Types.MagicDoor:
+                GetBumped = DoorBump;
+                break;
+        }
     }
 
     //When I'm destroyed make sure I destroy myself safely
-    public virtual void Despawn()
+    public void Despawn()
     {
         if (Location != null)
             LeaveTile(Location);
@@ -60,7 +98,6 @@ public class WorldThing : MonoBehaviour
         Location.Contents = this;
         transform.SetParent(Location.transform);
         transform.localPosition = Vector3.zero;
-        Debug.Log("SET LOCATION: " + name + " / " + tile.X + "." + tile.Y);
     }
 
     //When you leave a tile remove yourself from its contents
@@ -73,11 +110,11 @@ public class WorldThing : MonoBehaviour
 
     //When the player (or something else) tries to enter a square containing this, run this function
     //The return bool is whether you let the player enter or not. On a true the player can enter, on a false they can't
-    public virtual IEnumerator GetBumped(WorldThing bumper)
-    {
-        //By default let's just say that if you try to enter this square nothing happens and you can't get in
-        yield return null;
-    }
+//    public void GetBumped(WorldThing bumper)
+//    {
+//        //By default let's just say that if you try to enter this square nothing happens and you can't get in
+//        
+//    }
 
     //Move to a position relative to your current location
     public void Move(int x, int y)
@@ -93,28 +130,11 @@ public class WorldThing : MonoBehaviour
         if (target == null)
             return;
         if (target.Contents != null)
-            StartCoroutine(PlayAnim(target.Contents.GetBumped(this)));
+            target.Contents.GetBumped(this);
         else
-            StartCoroutine(PlayAnim(Walk(target)));
-    }
-
-    public IEnumerator PlayAnim(IEnumerator coroutine)
-    {
-        IM.CanAct = false;
-        yield return StartCoroutine(coroutine);
-        IM.CanAct = true;
+            SetLocation(target);
     }
     
-    public IEnumerator Walk(TileThing target)
-    {
-        while (Vector3.Distance(transform.position, target.transform.position) > 0.05f)
-        {
-            transform.position = Vector3.Lerp(transform.position,target.transform.position,0.3f);
-            yield return null;
-        }
-        SetLocation(target);
-    }
-
     public enum Types
     {
         None=0,
@@ -124,6 +144,55 @@ public class WorldThing : MonoBehaviour
         ScoreThing=4,
         MagicDoor=5,
         RedKey=6
+    }
+    
+    public void DoorBump(WorldThing bumper)
+    {
+        //If you enter the door and you have the key, reload the scene
+        if (bumper.Type == Types.Player && bumper.HasKey)
+        {
+            TileThing loc = Location;
+            Location.Contents = null;
+            bumper.SetLocation(loc);
+            SceneManager.LoadScene("Game");
+        }
+    }
+    
+    public void KeyBump(WorldThing bumper)
+    {
+        //If you touch this, you get a key! And the key goes on top of you
+        if (bumper.Type == Types.Player)
+        {
+            TileThing loc = Location;
+            bumper.HasKey = true;
+            LeaveTile(Location);
+            transform.SetParent(bumper.transform);
+            transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
+            transform.localScale = new Vector3(0.5f,0.5f,1);
+            bumper.SetLocation(loc);
+        }
+    }
+    
+    public void MonsterBump(WorldThing bumper)
+    {
+        //Bump into a monster and kill it but take damage
+        if (bumper.Type == Types.Player)
+        {
+            God.GSM.TakeDamage(Species.Damage);
+            Despawn();
+        }
+    }
+    
+    public void ScoreBump(WorldThing bumper)
+    {
+        //If you stand on the score thing you get a point
+        if (bumper.Type == Types.Player)
+        {
+            TileThing loc = Location;
+            Despawn();
+            God.GSM.ChangeScore(1);
+            bumper.SetLocation(loc);
+        }
     }
 
 }

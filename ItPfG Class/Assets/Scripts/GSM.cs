@@ -77,12 +77,17 @@ public class GSM : MonoBehaviour
         {
             HP = 0;
             //GetThings(WorldThing.Types.Player)[0].Despawn();
-            GetThings<PlayerThing>()[0].Despawn();
+            GetThings(WorldThing.Types.Player)[0].Despawn();
             God.GSM.SetText("You Died");
         }
         UpdateText();
     }
 
+    public void SayHi()
+    {
+        Debug.Log("HELLO! " + Time.time);
+    }
+    
     void UpdateText()
     {
         ScoreTxt.text = "Score: " + Score + "\n" + "HP: " + HP;

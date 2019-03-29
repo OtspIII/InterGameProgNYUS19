@@ -6,7 +6,8 @@ public class LibraryManager : MonoBehaviour
 {
     public TileThing TileP;
     public List<SpawnableEntry> AllWTs;
-    Dictionary<WorldThing.Types,WorldThing> ThingDict = new Dictionary<WorldThing.Types, WorldThing>();
+    Dictionary<WorldThing.Types,Sprite> ThingDict = new Dictionary<WorldThing.Types, Sprite>();
+    public WorldThing Thing;
     public List<MonsterType> Monsters;
 
     void Awake()
@@ -25,15 +26,8 @@ public class LibraryManager : MonoBehaviour
 
     public WorldThing SpawnThing(WorldThing.Types t,TileThing tile)
     {
-        WorldThing prefab = (ThingDict.ContainsKey(t) ? ThingDict[t] : null);
-//        if (ThingDict.ContainsKey(t))
-//            prefab = ThingDict[t];
-//        else
-//            prefab = null;
-        if (prefab == null)
-            return null;
-        WorldThing r = Instantiate(prefab).GetComponent<WorldThing>();
-        r.Setup(tile);
+        WorldThing r = Instantiate(Thing).GetComponent<WorldThing>();
+        r.Setup(tile,t);
         return r;
     }
 
@@ -41,12 +35,17 @@ public class LibraryManager : MonoBehaviour
     {
         return Monsters[Random.Range(0, Monsters.Count)];
     }
+
+    public Sprite GetSprite(WorldThing.Types t)
+    {
+        return ThingDict[t];
+    }
 }
 
 [System.Serializable]
 public struct SpawnableEntry
 {
     public WorldThing.Types A;
-    public WorldThing B;
+    public Sprite B;
 }
 
