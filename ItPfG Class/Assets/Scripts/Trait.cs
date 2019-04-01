@@ -19,6 +19,7 @@ public class EventMsg
     public WorldThing Source;
     public int Amount;
     public Inputs Dir;
+    public string Text = "";
 
     public EventMsg(EventType type,WorldThing source,int amt=0,Inputs dir=Inputs.None)
     {
@@ -41,7 +42,8 @@ public enum EventType
     None,
     GetBumped,
     TakeDmg,
-    PlayerInput
+    PlayerInput,
+    GetName
 }
 
 public class KeyTrait : Trait
@@ -49,6 +51,7 @@ public class KeyTrait : Trait
     public KeyTrait()
     {
         ListenFor.Add(EventType.GetBumped);
+        ListenFor.Add(EventType.GetName);
     }
 
     public override void TakeMsg(WorldThing who, EventMsg msg)
@@ -69,6 +72,9 @@ public class KeyTrait : Trait
                     who.gameObject.SetActive(true);
                 }
                 return;
+            case EventType.GetName:
+                msg.Text += " KEY";
+                return;
         }
         
     }
@@ -79,6 +85,7 @@ public class DoorTrait : Trait
      public DoorTrait()
      {
          ListenFor.Add(EventType.GetBumped);
+         ListenFor.Add(EventType.GetName);
      }
  
      public override void TakeMsg(WorldThing who, EventMsg msg)
@@ -95,6 +102,9 @@ public class DoorTrait : Trait
                      SceneManager.LoadScene("Game");
                  }
                  return;
+             case EventType.GetName:
+                 msg.Text += " DOOR";
+                 return;
          }
          
      }
@@ -105,6 +115,7 @@ public class MonsterTrait : Trait
     public MonsterTrait()
     {
         ListenFor.Add(EventType.GetBumped);
+        ListenFor.Add(EventType.GetName);
     }
 
     public override void TakeMsg(WorldThing who, EventMsg msg)
@@ -114,6 +125,9 @@ public class MonsterTrait : Trait
             case EventType.GetBumped:
                 msg.Source.TakeMsg(new EventMsg(EventType.TakeDmg,who,who.Species.Damage));
                 who.Despawn();
+                return;
+            case EventType.GetName:
+                msg.Text += " " + who.Species.Type;
                 return;
         }
         
@@ -125,6 +139,7 @@ public class ScoreTrait : Trait
     public ScoreTrait()
     {
         ListenFor.Add(EventType.GetBumped);
+        ListenFor.Add(EventType.GetName);
     }
 
     public override void TakeMsg(WorldThing who, EventMsg msg)
@@ -141,6 +156,9 @@ public class ScoreTrait : Trait
                     bumper.SetLocation(loc);
                 }
                 return;
+            case EventType.GetName:
+                msg.Text += " SCORETHING";
+                return;
         }
         
     }
@@ -152,6 +170,7 @@ public class PlayerTrait : Trait
     {
         ListenFor.Add(EventType.TakeDmg);
         ListenFor.Add(EventType.PlayerInput);
+        ListenFor.Add(EventType.GetName);
     }
 
     public override void TakeMsg(WorldThing who, EventMsg msg)
@@ -179,6 +198,9 @@ public class PlayerTrait : Trait
                 {
                     who.Move(0,-1);
                 }
+                return;
+            case EventType.GetName:
+                msg.Text += " PLAYER";
                 return;
         }
         

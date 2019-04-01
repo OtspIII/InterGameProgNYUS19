@@ -33,6 +33,8 @@ public class WorldThing : MonoBehaviour
         {
             TakeMsg(new EventMsg(Inputs.Down));
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+            Debug.Log(this);
     }
 
     //When I first spawn a world thing I need to run setup on it so that it does basic stuff like place itself
@@ -51,6 +53,7 @@ public class WorldThing : MonoBehaviour
                 Species = God.Library.GetRandomMonster();
                 Body.sprite = Species.S;
                 AddTrait(new MonsterTrait());
+                AddTrait(new KeyTrait());
                 break;
             case Types.Player:
                 AddTrait(new PlayerTrait());
@@ -158,5 +161,13 @@ public class WorldThing : MonoBehaviour
             return;
         foreach(Trait t in Listeners[msg.Type])
             t.TakeMsg(this,msg);
+    }
+
+    public override string ToString()
+    {
+        EventMsg nam = new EventMsg(EventType.GetName,null);
+        nam.Text = "WT: ";
+        TakeMsg(nam);
+        return nam.Text;
     }
 }
