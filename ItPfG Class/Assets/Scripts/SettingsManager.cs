@@ -5,7 +5,7 @@ using UnityEngine;
 public class SettingsManager : MonoBehaviour
 {
     public Vector2 MapSize;
-    public List<WorldThing.Types> MapContents;
+    public List<ThingTypes> MapContents;
 
     void Awake()
     {

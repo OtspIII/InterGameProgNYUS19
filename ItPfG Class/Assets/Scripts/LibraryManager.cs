@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class LibraryManager : MonoBehaviour
 {
-    public TileThing TileP;
+    public TileView TileP;
     public List<SpawnableEntry> AllWTs;
-    Dictionary<WorldThing.Types,Sprite> ThingDict = new Dictionary<WorldThing.Types, Sprite>();
-    public WorldThing Thing;
+    Dictionary<ThingTypes,Sprite> ThingDict = new Dictionary<ThingTypes, Sprite>();
+    public ActorView Thing;
     public List<MonsterType> Monsters;
 
     void Awake()
@@ -17,17 +17,17 @@ public class LibraryManager : MonoBehaviour
             ThingDict.Add(se.A,se.B);
     }
     
-    public TileThing SpawnTile(int x, int y)
+    public TileView SpawnTile(TileModel t)
     {
-        TileThing r = Instantiate(TileP).GetComponent<TileThing>();
-        r.Setup(x,y);
+        TileView r = Instantiate(TileP).GetComponent<TileView>();
+        r.Setup(t);
         return r;
     }
 
-    public WorldThing SpawnThing(WorldThing.Types t,TileThing tile)
+    public ActorView SpawnThing(ActorModel m)
     {
-        WorldThing r = Instantiate(Thing).GetComponent<WorldThing>();
-        r.Setup(tile,t);
+        ActorView r = Instantiate(Thing).GetComponent<ActorView>();
+        r.Setup(m);
         return r;
     }
 
@@ -36,7 +36,7 @@ public class LibraryManager : MonoBehaviour
         return Monsters[Random.Range(0, Monsters.Count)];
     }
 
-    public Sprite GetSprite(WorldThing.Types t)
+    public Sprite GetSprite(ThingTypes t)
     {
         return ThingDict[t];
     }
@@ -45,7 +45,7 @@ public class LibraryManager : MonoBehaviour
 [System.Serializable]
 public struct SpawnableEntry
 {
-    public WorldThing.Types A;
+    public ThingTypes A;
     public Sprite B;
 }
 

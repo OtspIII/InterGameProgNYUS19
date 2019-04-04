@@ -7,7 +7,7 @@ public class Trait
 {
     public List<EventType> ListenFor = new List<EventType>();
 
-    public virtual void TakeMsg(WorldThing who, EventMsg msg)
+    public virtual void TakeMsg(ActorModel who, EventMsg msg)
     {
         
     }
@@ -16,12 +16,12 @@ public class Trait
 public class EventMsg
 {
     public EventType Type;
-    public WorldThing Source;
+    public ActorModel Source;
     public int Amount;
     public Inputs Dir;
     public string Text = "";
 
-    public EventMsg(EventType type,WorldThing source,int amt=0,Inputs dir=Inputs.None)
+    public EventMsg(EventType type,ActorModel source,int amt=0,Inputs dir=Inputs.None)
     {
         Type = type;
         Source = source;
@@ -54,22 +54,23 @@ public class KeyTrait : Trait
         ListenFor.Add(EventType.GetName);
     }
 
-    public override void TakeMsg(WorldThing who, EventMsg msg)
+    public override void TakeMsg(ActorModel who, EventMsg msg)
     {
         switch (msg.Type)
         {
             case EventType.GetBumped:
-                WorldThing bumper = msg.Source;
-                if (bumper.Type == WorldThing.Types.Player)
+                ActorModel bumper = msg.Source;
+                if (bumper.Type == ThingTypes.Player)
                 {
-                    TileThing loc = who.Location;
+                    TileModel loc = who.Location;
                     bumper.HasKey = true;
                     who.LeaveTile(who.Location);
-                    who.transform.SetParent(bumper.transform);
-                    who.transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
-                    who.transform.localScale = new Vector3(0.5f,0.5f,1);
                     bumper.SetLocation(loc);
-                    who.gameObject.SetActive(true);
+                    
+                    who.View.transform.SetParent(bumper.View.transform);
+                    who.View.transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
+                    who.View.transform.localScale = new Vector3(0.5f,0.5f,1);
+                    who.View.gameObject.SetActive(true);
                 }
                 return;
             case EventType.GetName:
@@ -88,15 +89,15 @@ public class DoorTrait : Trait
          ListenFor.Add(EventType.GetName);
      }
  
-     public override void TakeMsg(WorldThing who, EventMsg msg)
+     public override void TakeMsg(ActorModel who, EventMsg msg)
      {
          switch (msg.Type)
          {
              case EventType.GetBumped:
-                 WorldThing bumper = msg.Source;
+                 ActorModel bumper = msg.Source;
                  if (bumper.HasKey)
                  {
-                     TileThing loc = who.Location;
+                     TileModel loc = who.Location;
                      who.Location.Contents = null;
                      bumper.SetLocation(loc);
                      SceneManager.LoadScene("Game");
@@ -118,7 +119,7 @@ public class MonsterTrait : Trait
         ListenFor.Add(EventType.GetName);
     }
 
-    public override void TakeMsg(WorldThing who, EventMsg msg)
+    public override void TakeMsg(ActorModel who, EventMsg msg)
     {
         switch (msg.Type)
         {
@@ -142,17 +143,17 @@ public class ScoreTrait : Trait
         ListenFor.Add(EventType.GetName);
     }
 
-    public override void TakeMsg(WorldThing who, EventMsg msg)
+    public override void TakeMsg(ActorModel who, EventMsg msg)
     {
         switch (msg.Type)
         {
             case EventType.GetBumped:
-                WorldThing bumper = msg.Source;
-                if (bumper.Type == WorldThing.Types.Player)
+                ActorModel bumper = msg.Source;
+                if (bumper.Type == ThingTypes.Player)
                 {
-                    TileThing loc = who.Location;
+                    TileModel loc = who.Location;
                     who.Despawn();
-                    God.GSM.ChangeScore(1);
+                    ModelManager.ChangeScore(1);
                     bumper.SetLocation(loc);
                 }
                 return;
@@ -173,13 +174,13 @@ public class PlayerTrait : Trait
         ListenFor.Add(EventType.GetName);
     }
 
-    public override void TakeMsg(WorldThing who, EventMsg msg)
+    public override void TakeMsg(ActorModel who, EventMsg msg)
     {
         switch (msg.Type)
         {
             case EventType.TakeDmg:
                 int amount = msg.Amount;
-                God.GSM.TakeDamage(amount);
+                ModelManager.TakeDamage(amount);
                 return;
             case EventType.PlayerInput:
                 if (msg.Dir == Inputs.Left)
