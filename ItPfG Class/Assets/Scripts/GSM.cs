@@ -9,10 +9,6 @@ public class GSM : MonoBehaviour
     public TextMeshPro Text;
     public TextMeshPro ScoreTxt;
 
-//    public List<ActorView> AllThings;
-//    public List<TileView> AllTiles;
-//    public Dictionary<int, Dictionary<int, TileView>> Tiles = new Dictionary<int, Dictionary<int, TileView>>();
-
 
     void Awake()
     {

@@ -47,7 +47,7 @@ public class ActorModel
     {
         if (Location != null)
             LeaveTile(Location);
-//        gameObject.SetActive(false);
+        God.C.AddAction(new VanishAction(this));
         ModelManager.AllThings.Remove(this);
     }
     
@@ -57,6 +57,8 @@ public class ActorModel
         //Neighbor() asks the tile what the tile is relative to them with an x any offset
         TileModel target = Location.Neighbor(x, y);
         Move(target);
+        if (target == null || (target.Contents != null && target.Contents != this))
+            God.C.AddAction(new BumpAction(this,Location.X + ((float)x)/2f,Location.Y + ((float)y)/2f));
     }
     
     //If I try to move to a tile, run the bump code on any object in the area and if none stop me move there
@@ -114,7 +116,8 @@ public class ActorModel
         if (Location.Contents != null && Location.Contents != this)
             Debug.Log("I just orphaned a world thing at location " + tile.X + " / " + tile.Y);
         Location.Contents = this;
-        if (View != null) View.SetLocation(Location.View);
+        if (View != null) 
+            God.C.AddAction(new MoveAction(this,tile));
     }
 
     //When you leave a tile remove yourself from its contents
@@ -122,7 +125,6 @@ public class ActorModel
     {
         if (tile.Contents == this)
             tile.Contents =  null;
-        if (View != null) View.transform.position = new Vector3(999,999,-999);
     }
 }
 
@@ -135,4 +137,48 @@ public enum ThingTypes
     ScoreThing=4,
     MagicDoor=5,
     RedKey=6
+}
+
+public class VanishAction : GameAction
+{
+    public ActorModel Who;
+    
+    public VanishAction(ActorModel who)
+    {
+        Who = who;
+    }
+
+    public override IEnumerator Run()
+    {
+        Who.View.gameObject.SetActive(false);
+        yield return null;
+    }
+}
+
+public class MoveAction : GameAction
+{
+    public ActorModel Who;
+    public TileModel Where;
+    
+    public MoveAction(ActorModel who, TileModel where)
+    {
+        Who = who;
+        Where = where;
+    }
+
+    public override IEnumerator Run()
+    {
+        Who.View.transform.SetParent(Where.View.transform);
+        float timer = 0;
+        Vector3 startPos = Who.View.transform.localPosition;
+        Vector3 endPos = new Vector3(0,0,-0.1f);
+        while (timer < 1)
+        {
+            timer += Time.deltaTime / 0.1f;
+            float t = God.Ease (timer, true);
+            Who.View.transform.localPosition = Vector3.Lerp(startPos,endPos,t);
+            yield return null;
+        }
+        Who.View.transform.localPosition = endPos;
+    }
 }

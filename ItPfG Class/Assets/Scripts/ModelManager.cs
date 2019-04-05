@@ -87,8 +87,7 @@ public static class ModelManager
         if (HP <= 0)
         {
             HP = 0;
-            GetThings(ThingTypes.Player)[0].Despawn();
-            God.GSM.SetText("You Died");
+            God.C.AddAction(new DeathAction(GetThings(ThingTypes.Player)[0]));
         }
     }
 }

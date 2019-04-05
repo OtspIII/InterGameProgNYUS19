@@ -66,11 +66,8 @@ public class KeyTrait : Trait
                     bumper.HasKey = true;
                     who.LeaveTile(who.Location);
                     bumper.SetLocation(loc);
+                    God.C.AddAction(new GainKeyAction(bumper,who));
                     
-                    who.View.transform.SetParent(bumper.View.transform);
-                    who.View.transform.localPosition = new Vector3(0.25f,0.25f,-0.1f);
-                    who.View.transform.localScale = new Vector3(0.5f,0.5f,1);
-                    who.View.gameObject.SetActive(true);
                 }
                 return;
             case EventType.GetName:
@@ -78,6 +75,39 @@ public class KeyTrait : Trait
                 return;
         }
         
+    }
+}
+
+public class GainKeyAction : GameAction
+{
+    public ActorModel Player;
+    public ActorModel Key;
+
+    public GainKeyAction(ActorModel player, ActorModel key)
+    {
+        Player = player;
+        Key = key;
+    }
+    
+    public override IEnumerator Run()
+    {
+        Key.View.transform.SetParent(Player.View.transform);
+        Key.View.gameObject.SetActive(true);
+        float timer = 0;
+        Vector3 startPos = Key.View.transform.localPosition;
+        Vector3 endPos = new Vector3(0.25f,0.25f,-0.1f);
+        Vector3 startSize = Key.View.transform.localScale;
+        Vector3 endSize = new Vector3(0.5f,0.5f,1);
+        while (timer < 1)
+        {
+            timer += Time.deltaTime / 0.2f;
+            float t = God.Ease (timer, true);
+            Key.View.transform.localPosition = Vector3.Lerp(startPos,endPos,t);
+            Key.View.transform.localScale = Vector3.Lerp(startSize,endSize,t);
+            yield return null;
+        }
+        Key.View.transform.localPosition = endPos;
+        Key.View.transform.localScale = endSize;
     }
 }
 
@@ -97,10 +127,8 @@ public class DoorTrait : Trait
                  ActorModel bumper = msg.Source;
                  if (bumper.HasKey)
                  {
-                     TileModel loc = who.Location;
-                     who.Location.Contents = null;
-                     bumper.SetLocation(loc);
-                     SceneManager.LoadScene("Game");
+                     God.C.AddAction(new UseDoorAction(bumper,who));
+                     
                  }
                  return;
              case EventType.GetName:
@@ -110,6 +138,39 @@ public class DoorTrait : Trait
          
      }
  }
+
+public class UseDoorAction : GameAction
+{
+    public ActorModel Player;
+    public ActorModel Door;
+
+    public UseDoorAction(ActorModel player, ActorModel door)
+    {
+        Player = player;
+        Door = door;
+    }
+    
+    public override IEnumerator Run()
+    {
+        Player.View.transform.SetParent(Door.View.transform);
+        float timer = 0;
+        Vector3 startPos = Player.View.transform.localPosition;
+        Vector3 endPos = new Vector3(0,0,-0.1f);
+        Vector3 startSize = Player.View.transform.localScale;
+        Vector3 endSize = new Vector3(0,0,1);
+        while (timer < 1)
+        {
+            timer += Time.deltaTime / 0.5f;
+            float t = God.Ease (timer, true);
+            Player.View.transform.localPosition = Vector3.Lerp(startPos,endPos,t);
+            Player.View.transform.localScale = Vector3.Lerp(startSize,endSize,t);
+            Player.View.transform.Rotate(0,0,10);
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.2f);
+        SceneManager.LoadScene("Game");
+    }
+}
  
 public class MonsterTrait : Trait
 {
@@ -124,6 +185,7 @@ public class MonsterTrait : Trait
         switch (msg.Type)
         {
             case EventType.GetBumped:
+                God.C.AddAction(new BumpAction(msg.Source,who.Location.X,who.Location.Y));
                 msg.Source.TakeMsg(new EventMsg(EventType.TakeDmg,who,who.Species.Damage));
                 who.Despawn();
                 return;
@@ -132,6 +194,36 @@ public class MonsterTrait : Trait
                 return;
         }
         
+    }
+}
+
+public class BumpAction : GameAction
+{
+    public ActorModel Player;
+    public float DirX;
+    public float DirY;
+
+    public BumpAction(ActorModel player, float x, float y)
+    {
+        Player = player;
+        DirX = x;
+        DirY = y;
+    }
+    
+    public override IEnumerator Run()
+    {
+        float timer = 0;
+        Vector3 startPos = Player.View.transform.position;
+        Vector3 endPos = new Vector3(DirX,DirY,-0.1f);
+        while (timer < 1)
+        {
+            timer += Time.deltaTime / 0.1f;
+            float t = Mathf.Sin(timer * Mathf.PI);
+            Player.View.transform.position = Vector3.Lerp(startPos,endPos,t);
+            yield return null;
+        }
+        Player.View.transform.localPosition = Vector3.zero;
+        God.GSM.UpdateText();
     }
 }
 
@@ -152,6 +244,7 @@ public class ScoreTrait : Trait
                 if (bumper.Type == ThingTypes.Player)
                 {
                     TileModel loc = who.Location;
+                    God.C.AddAction(new GetScoreAction(bumper,who));
                     who.Despawn();
                     ModelManager.ChangeScore(1);
                     bumper.SetLocation(loc);
@@ -162,6 +255,38 @@ public class ScoreTrait : Trait
                 return;
         }
         
+    }
+}
+
+public class GetScoreAction : GameAction
+{
+    public ActorModel Player;
+    public ActorModel Score;
+
+    public GetScoreAction(ActorModel player, ActorModel score)
+    {
+        Player = player;
+        Score = score;
+    }
+    
+    public override IEnumerator Run()
+    {
+        Score.View.transform.SetParent(Player.View.transform);
+        float timer = 0;
+        Vector3 startPos = Score.View.transform.localPosition;
+        Vector3 endPos = new Vector3(0,0,-0.1f);
+        Vector3 startSize = Score.View.transform.localScale;
+        Vector3 endSize = new Vector3(0,0,1);
+        while (timer < 1)
+        {
+            timer += Time.deltaTime / 0.2f;
+            float t = God.Ease (timer, true);
+            Score.View.transform.localPosition = Vector3.Lerp(startPos,endPos,t);
+            Score.View.transform.localScale = Vector3.Lerp(startSize,endSize,t);
+            Score.View.transform.Rotate(0,0,30);
+            yield return null;
+        }
+        God.GSM.UpdateText();
     }
 }
 
@@ -180,6 +305,7 @@ public class PlayerTrait : Trait
         {
             case EventType.TakeDmg:
                 int amount = msg.Amount;
+                God.C.AddAction(new TakeDamageAction(who,amount));
                 ModelManager.TakeDamage(amount);
                 return;
             case EventType.PlayerInput:
@@ -204,6 +330,55 @@ public class PlayerTrait : Trait
                 msg.Text += " PLAYER";
                 return;
         }
-        
+    }
+}
+
+public class TakeDamageAction : GameAction
+{
+    public ActorModel Player;
+    public float Amount;
+
+    public TakeDamageAction(ActorModel player, float amt)
+    {
+        Player = player;
+        Amount = amt / 10;
+    }
+    
+    public override IEnumerator Run()
+    {
+        float timer = 0;
+        while (timer < Amount)
+        {
+            timer += Time.deltaTime;
+            Player.View.transform.localPosition = new Vector3(Random.Range(-Amount,Amount),Random.Range(-Amount,Amount),0);
+            yield return null;
+        }
+        Player.View.transform.localPosition = Vector3.zero;
+        God.GSM.UpdateText();
+    }
+}
+
+public class DeathAction : GameAction
+{
+    public ActorModel Who;
+    
+    public DeathAction(ActorModel who)
+    {
+        Who = who;
+    }
+
+    public override IEnumerator Run()
+    {
+        float timer = 0;
+        float size = Who.View.transform.localScale.x;
+        while (timer < 1)
+        {
+            timer += Time.deltaTime;
+            size *= 1.2f;
+            Who.View.transform.localScale = new Vector3(size,size,1);
+            Who.View.transform.Rotate(0,0,30);
+            yield return null;
+        }
+        God.GSM.SetText("You Died");
     }
 }

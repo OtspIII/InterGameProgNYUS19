@@ -4,7 +4,24 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-    void Update()
+    private Queue<GameAction> Acts = new Queue<GameAction>();
+    
+    void Awake()
+    {
+        God.C = this;
+        StartCoroutine(MainLoop());
+    }
+    
+    public IEnumerator MainLoop()
+    {
+        while (true)
+        {
+            ReadInputs();
+            yield return StartCoroutine(ResolveActions());
+        }
+    }
+    
+    void ReadInputs()
     {
         if (IM.Pressed(Inputs.Left))
         {
@@ -28,6 +45,18 @@ public class Controller : MonoBehaviour
     {
         foreach(ActorModel am in ModelManager.AllThings.ToArray())
             am.TakeMsg(msg);
-        God.GSM.UpdateText();
+    }
+
+    public void AddAction(GameAction a)
+    {
+        Acts.Enqueue(a);
+    }
+
+    public IEnumerator ResolveActions()
+    {
+        while (Acts.Count > 0)
+        {
+            yield return StartCoroutine(Acts.Dequeue().Run());
+        }
     }
 }
