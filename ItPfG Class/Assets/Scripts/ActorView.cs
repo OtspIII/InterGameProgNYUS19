@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class ActorView : MonoBehaviour
 {
-//    public ActorModel Model;
+    public ActorModel Model;
     
     protected SpriteRenderer Body;
     
@@ -20,7 +20,7 @@ public class ActorView : MonoBehaviour
     //When I first spawn a world thing I need to run setup on it so that it does basic stuff like place itself
     public void Setup(ActorModel m)
     {
-//        Model = m;
+        Model = m;
         m.View = this;
         Body = transform.Find("Body").GetComponent<SpriteRenderer>();
         gameObject.name = m.Type.ToString();
@@ -30,7 +30,7 @@ public class ActorView : MonoBehaviour
         if (m.Species != null)
             Body.sprite = m.Species.S;
         SetLocation(m.Location.View);
-
+//        transform.Rotate2D(50);
     }
     
     public void SetLocation(TileView tile)

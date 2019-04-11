@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class ActorModel
 {
-    public ActorView View;
+    [System.NonSerialized]public ActorView View;
     
     public TileModel Location;
     public ThingTypes Type;

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public static class ModelManager
 {
     public static bool Setup = false;
     
     public static List<ActorModel> AllThings = new List<ActorModel>();
     public static List<TileModel> AllTiles = new List<TileModel>();
-    public static Dictionary<int, Dictionary<int, TileModel>> Tiles = new Dictionary<int, Dictionary<int, TileModel>>();
+    [System.NonSerialized]public static Dictionary<int, Dictionary<int, TileModel>> Tiles = new Dictionary<int, Dictionary<int, TileModel>>();
     public static int Score;
     public static int HP = 10;
     
@@ -17,6 +18,7 @@ public static class ModelManager
         if (Setup)
             return;
         Setup = true;
+        LoadStats();
     }
     
     public static void BuildWorld()
@@ -89,5 +91,20 @@ public static class ModelManager
             HP = 0;
             God.C.AddAction(new DeathAction(GetThings(ThingTypes.Player)[0]));
         }
+    }
+
+    public static void SaveStats()
+    {
+        PlayerPrefs.SetInt("Score",Score);
+        PlayerPrefs.SetInt("HP",HP);
+    }
+    
+    public static void LoadStats()
+    {
+        if (PlayerPrefs.HasKey("Score"))
+            Score = PlayerPrefs.GetInt("Score");
+        if (PlayerPrefs.HasKey("HP"))
+            HP = PlayerPrefs.GetInt("HP");
+//        PlayerPrefs.DeleteKey();
     }
 }

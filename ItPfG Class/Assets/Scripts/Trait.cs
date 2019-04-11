@@ -128,7 +128,7 @@ public class DoorTrait : Trait
                  if (bumper.HasKey)
                  {
                      God.C.AddAction(new UseDoorAction(bumper,who));
-                     
+                     ModelManager.SaveStats();
                  }
                  return;
              case EventType.GetName:

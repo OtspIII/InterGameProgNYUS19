@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class TileView : MonoBehaviour
 {
-//    public TileModel Model;
+    public TileModel Model;
 
     public void Setup(TileModel m)
     {
-//        Model = m;
+        Model = m;
         m.View = this;
         transform.position = new Vector3(m.X,m.Y,0);
 //        God.GSM.AllTiles.Add(this);
