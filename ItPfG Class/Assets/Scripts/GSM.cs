@@ -13,12 +13,12 @@ public class GSM : MonoBehaviour
     void Awake()
     {
         God.GSM = this;
-        ModelManager.Init();//This will only actually run code the first time called
     }
 
     void Start()
     {
-        ModelManager.BuildWorld();
+        ModelManager.BuildModel();
+        ModelManager.BuildView();
         UpdateText();
     }
 

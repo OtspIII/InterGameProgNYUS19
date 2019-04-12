@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Controller : MonoBehaviour
 {
@@ -39,11 +40,28 @@ public class Controller : MonoBehaviour
         {
             MsgAll(new EventMsg(Inputs.Down));
         }
+        
+        if (Input.GetKeyUp(KeyCode.S))
+        {
+            ModelManager.SaveGame();
+        }
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            ModelManager.PendingSave = ModelManager.LoadGame();
+            if (ModelManager.PendingSave != null)
+                SceneManager.LoadScene(0);
+            else
+                Debug.Log("NO FILE TO LOAD");
+        }
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            ModelManager.DeleteSave();
+        }
     }
 
     public void MsgAll(EventMsg msg)
     {
-        foreach(ActorModel am in ModelManager.AllThings.ToArray())
+        foreach(ActorModel am in ModelManager.GetActors())
             am.TakeMsg(msg);
     }
 

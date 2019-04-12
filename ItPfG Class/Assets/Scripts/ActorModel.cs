@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,39 +7,41 @@ using UnityEngine;
 public class ActorModel
 {
     [System.NonSerialized]public ActorView View;
-    
-    public TileModel Location;
+
+    public Guid ID;
+    public Point Location = null;
     public ThingTypes Type;
-    public MonsterType Species;
+    public MonsterType.Types Species;
     public bool HasKey = false;
     
-    public List<Trait> Traits = new List<Trait>();
-    public Dictionary<EventType,List<Trait>> Listeners = new Dictionary<EventType, List<Trait>>();
+    public List<Traits> TraitList = new List<Traits>();
+    [NonSerialized]public Dictionary<EventType,List<Trait>> Listeners = new Dictionary<EventType, List<Trait>>();
     
     //When I first spawn a world thing I need to run setup on it so that it does basic stuff like place itself
     public ActorModel(TileModel start,ThingTypes thingType)
     {
+        ID = Guid.NewGuid();
         Type = thingType;
         SetLocation(start);
-        if (!ModelManager.AllThings.Contains(this))
-            ModelManager.AllThings.Add(this);
+        if (!ModelManager.AllThings.ContainsKey(ID))
+            ModelManager.AllThings.Add(ID,this);
         switch (thingType)
         {
             case ThingTypes.Skeleton:
-                Species = God.Library.GetRandomMonster();
-                AddTrait(new MonsterTrait());
+                Species = God.Library.GetRandomMonster().Type;
+                AddTrait(Traits.Monster);
                 break;
             case ThingTypes.Player:
-                AddTrait(new PlayerTrait());
+                AddTrait(Traits.Player);
                 break;
             case ThingTypes.ScoreThing:
-                AddTrait(new ScoreTrait());
+                AddTrait(Traits.Score);
                 break;
             case ThingTypes.RedKey:
-                AddTrait(new KeyTrait());
+                AddTrait(Traits.Key);
                 break;
             case ThingTypes.MagicDoor:
-                AddTrait(new DoorTrait());
+                AddTrait(Traits.Door);
                 break;
         }
     }
@@ -46,20 +49,25 @@ public class ActorModel
     //When I'm destroyed make sure I destroy myself safely
     public void Despawn()
     {
-        if (Location != null)
-            LeaveTile(Location);
+        if (GetLocation() != null)
+            LeaveTile(GetLocation());
         God.C.AddAction(new VanishAction(this));
-        ModelManager.AllThings.Remove(this);
+        ModelManager.AllThings.Remove(ID);
     }
     
     //Move to a position relative to your current location
     public void Move(int x, int y)
     {
         //Neighbor() asks the tile what the tile is relative to them with an x any offset
-        TileModel target = Location.Neighbor(x, y);
+        TileModel target = GetLocation().Neighbor(x, y);
         Move(target);
-        if (target == null || (target.Contents != null && target.Contents != this))
-            God.C.AddAction(new BumpAction(this,Location.X + ((float)x)/2f,Location.Y + ((float)y)/2f));
+        if (target == null || (target.GetContents() != null && target.GetContents() != this))
+            God.C.AddAction(new BumpAction(this,Location.x + ((float)x)/2f,Location.y + ((float)y)/2f));
+    }
+
+    public TileModel GetLocation()
+    {
+        return ModelManager.GetTile(Location);
     }
     
     //If I try to move to a tile, run the bump code on any object in the area and if none stop me move there
@@ -67,10 +75,10 @@ public class ActorModel
     {
         if (target == null)
             return;
-        if (target.Contents != null)
+        if (target.GetContents() != null)
         {
             EventMsg bumpMsg = new EventMsg(EventType.GetBumped,this);
-            target.Contents.TakeMsg(bumpMsg);
+            target.GetContents().TakeMsg(bumpMsg);
         }
         else
             SetLocation(target);
@@ -78,9 +86,15 @@ public class ActorModel
     
     
 
-    public void AddTrait(Trait t)
+    public void AddTrait(Traits tr)
     {
-        Traits.Add(t);
+        TraitList.Add(tr);
+        Install(God.Library.TraitDict[tr]);
+        
+    }
+
+    public void Install(Trait t)
+    {
         foreach (EventType e in t.ListenFor)
         {
             if (!Listeners.ContainsKey(e))
@@ -89,6 +103,14 @@ public class ActorModel
         }
     }
 
+    public List<Trait> GetTraits()
+    {
+        List<Trait> r = new List<Trait>();
+        foreach(Traits t in TraitList)
+            r.Add(God.Library.TraitDict[t]);
+        return r;
+    }
+    
     public void TakeMsg(EventMsg msg)
     {
         if (!Listeners.ContainsKey(msg.Type))
@@ -111,12 +133,12 @@ public class ActorModel
     //Note that this does no checks to see if a square is a valid place to go--that's in the Move function
     public void SetLocation(TileModel tile)
     {
-        if (Location != null)
-            LeaveTile(Location);
-        Location = tile;
-        if (Location.Contents != null && Location.Contents != this)
+        if (GetLocation() != null)
+            LeaveTile(GetLocation());
+        Location = new Point(tile.X,tile.Y);
+        if (GetLocation().GetContents() != null && GetLocation().GetContents() != this)
             Debug.Log("I just orphaned a world thing at location " + tile.X + " / " + tile.Y);
-        Location.Contents = this;
+        GetLocation().Contents = ID;
         if (View != null) 
             God.C.AddAction(new MoveAction(this,tile));
     }
@@ -124,8 +146,15 @@ public class ActorModel
     //When you leave a tile remove yourself from its contents
     public void LeaveTile(TileModel tile)
     {
-        if (tile.Contents == this)
-            tile.Contents =  null;
+        if (tile.GetContents() == this)
+            tile.Contents =  Guid.Empty;
+    }
+
+    public void OnLoad()
+    {
+        Listeners = new Dictionary<EventType, List<Trait>>();
+     foreach(Trait t in GetTraits())
+         Install(t);
     }
 }
 

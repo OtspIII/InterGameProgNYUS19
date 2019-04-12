@@ -1,13 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class TileModel
 {
-    public TileView View;
+    public Guid ID;
+    [NonSerialized]public TileView View;
     //What world things are in me?
-    public ActorModel Contents;
+    public Guid Contents;
     
     //What are my map coordinates?
     public int X;
@@ -15,10 +17,23 @@ public class TileModel
     
     public TileModel(int x, int y)
     {
+        ID = Guid.NewGuid();
         X = x;
         Y = y;
         //Register yourself with the GSM when you spawn
-        ModelManager.AllTiles.Add(this);
+        ModelManager.AllTiles.Add(ID,this);
+        if (!ModelManager.Tiles.ContainsKey(X))
+            ModelManager.Tiles.Add(X,new Dictionary<int, TileModel>());
+        ModelManager.Tiles[X].Add(Y,this);
+    }
+
+    public ActorModel GetContents()
+    {
+        return ModelManager.GetActor(Contents);
+    }
+
+    public void OnLoad()
+    {
         if (!ModelManager.Tiles.ContainsKey(X))
             ModelManager.Tiles.Add(X,new Dictionary<int, TileModel>());
         ModelManager.Tiles[X].Add(Y,this);

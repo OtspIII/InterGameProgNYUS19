@@ -27,14 +27,15 @@ public class ActorView : MonoBehaviour
 //        if (!God.GSM.AllThings.Contains(this))
 //            God.GSM.AllThings.Add(this);
         Body.sprite = God.Library.GetSprite(m.Type);
-        if (m.Species != null)
-            Body.sprite = m.Species.S;
-        SetLocation(m.Location.View);
+        if (m.Species != MonsterType.Types.None)
+            Body.sprite = God.Library.GetMonster(m.Species).S;
+        SetLocation(m.GetLocation().View);
 //        transform.Rotate2D(50);
     }
     
     public void SetLocation(TileView tile)
     {
+        
         transform.SetParent(tile.transform);
         transform.localPosition = Vector3.zero;
     }

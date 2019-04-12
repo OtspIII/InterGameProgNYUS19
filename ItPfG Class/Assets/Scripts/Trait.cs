@@ -5,12 +5,28 @@ using UnityEngine.SceneManagement;
 
 public class Trait
 {
+    public Traits Type;
     public List<EventType> ListenFor = new List<EventType>();
 
+    public void Setup()
+    {
+        God.Library.TraitDict.Add(Type,this);
+    }
+    
     public virtual void TakeMsg(ActorModel who, EventMsg msg)
     {
         
     }
+}
+
+public enum Traits
+{
+    None=0,
+    Key=1,
+    Door=2,
+    Monster=3,
+    Score=4,
+    Player=5,
 }
 
 public class EventMsg
@@ -50,6 +66,7 @@ public class KeyTrait : Trait
 {
     public KeyTrait()
     {
+        Type = Traits.Key;
         ListenFor.Add(EventType.GetBumped);
         ListenFor.Add(EventType.GetName);
     }
@@ -62,9 +79,9 @@ public class KeyTrait : Trait
                 ActorModel bumper = msg.Source;
                 if (bumper.Type == ThingTypes.Player)
                 {
-                    TileModel loc = who.Location;
+                    TileModel loc = who.GetLocation();
                     bumper.HasKey = true;
-                    who.LeaveTile(who.Location);
+                    who.LeaveTile(who.GetLocation());
                     bumper.SetLocation(loc);
                     God.C.AddAction(new GainKeyAction(bumper,who));
                     
@@ -115,6 +132,7 @@ public class DoorTrait : Trait
  {
      public DoorTrait()
      {
+         Type = Traits.Door;
          ListenFor.Add(EventType.GetBumped);
          ListenFor.Add(EventType.GetName);
      }
@@ -128,7 +146,7 @@ public class DoorTrait : Trait
                  if (bumper.HasKey)
                  {
                      God.C.AddAction(new UseDoorAction(bumper,who));
-                     ModelManager.SaveStats();
+                     ModelManager.SaveGame();
                  }
                  return;
              case EventType.GetName:
@@ -176,6 +194,7 @@ public class MonsterTrait : Trait
 {
     public MonsterTrait()
     {
+        Type = Traits.Monster;
         ListenFor.Add(EventType.GetBumped);
         ListenFor.Add(EventType.GetName);
     }
@@ -185,12 +204,12 @@ public class MonsterTrait : Trait
         switch (msg.Type)
         {
             case EventType.GetBumped:
-                God.C.AddAction(new BumpAction(msg.Source,who.Location.X,who.Location.Y));
-                msg.Source.TakeMsg(new EventMsg(EventType.TakeDmg,who,who.Species.Damage));
+                God.C.AddAction(new BumpAction(msg.Source,who.Location.x,who.Location.y));
+                msg.Source.TakeMsg(new EventMsg(EventType.TakeDmg,who,God.Library.GetMonster(who.Species).Damage));
                 who.Despawn();
                 return;
             case EventType.GetName:
-                msg.Text += " " + who.Species.Type;
+                msg.Text += " " + God.Library.GetMonster(who.Species).Type;
                 return;
         }
         
@@ -231,6 +250,7 @@ public class ScoreTrait : Trait
 {
     public ScoreTrait()
     {
+        Type = Traits.Score;
         ListenFor.Add(EventType.GetBumped);
         ListenFor.Add(EventType.GetName);
     }
@@ -243,7 +263,7 @@ public class ScoreTrait : Trait
                 ActorModel bumper = msg.Source;
                 if (bumper.Type == ThingTypes.Player)
                 {
-                    TileModel loc = who.Location;
+                    TileModel loc = who.GetLocation();
                     God.C.AddAction(new GetScoreAction(bumper,who));
                     who.Despawn();
                     ModelManager.ChangeScore(1);
@@ -294,6 +314,7 @@ public class PlayerTrait : Trait
 {
     public PlayerTrait()
     {
+        Type = Traits.Player;
         ListenFor.Add(EventType.TakeDmg);
         ListenFor.Add(EventType.PlayerInput);
         ListenFor.Add(EventType.GetName);
