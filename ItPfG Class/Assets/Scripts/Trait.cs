@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Trait
+public abstract class Trait
 {
     public Traits Type;
     public List<EventType> ListenFor = new List<EventType>();
@@ -12,11 +12,9 @@ public class Trait
     {
         God.Library.TraitDict.Add(Type,this);
     }
-    
-    public virtual void TakeMsg(ActorModel who, EventMsg msg)
-    {
-        
-    }
+
+    public abstract void TakeMsg(ActorModel who, EventMsg msg);
+
 }
 
 public enum Traits

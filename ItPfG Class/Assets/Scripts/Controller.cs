@@ -57,6 +57,10 @@ public class Controller : MonoBehaviour
         {
             ModelManager.DeleteSave();
         }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            StartCoroutine(ModelManager.CaptureScreenshot("X"));
+        }
     }
 
     public void MsgAll(EventMsg msg)

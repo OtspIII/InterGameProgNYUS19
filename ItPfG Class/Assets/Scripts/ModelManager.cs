@@ -168,6 +168,23 @@ public static class ModelManager
         if (File.Exists(destination)) 
             File.Delete(destination);
     }
+    
+    public static IEnumerator CaptureScreenshot (string name)
+    {
+        int wid = Screen.width;
+        int hei = Screen.height;
+        Texture2D screenCap = new Texture2D (wid, hei, TextureFormat.RGB24, false);
+
+        yield return new WaitForEndOfFrame ();
+        screenCap.ReadPixels (new Rect (0, 0, wid, hei), 0, 0);
+        screenCap.Apply ();
+
+        // Encode texture into PNG
+        byte[] bytes = screenCap.EncodeToPNG ();
+
+        string x = string.Format (Application.persistentDataPath + "/SS" + name + ".png");
+        File.WriteAllBytes (x, bytes);
+    }
 }
 
 [System.Serializable]

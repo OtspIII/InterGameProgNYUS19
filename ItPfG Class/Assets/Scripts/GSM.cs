@@ -13,6 +13,7 @@ public class GSM : MonoBehaviour
     void Awake()
     {
         God.GSM = this;
+        Debug.Log(Application.persistentDataPath);
     }
 
     void Start()
