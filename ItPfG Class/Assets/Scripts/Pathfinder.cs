@@ -57,7 +57,7 @@ public static class Pathfinder
         while (current != null && current.Tile != start){
             //We add it to the start because we're tracing the path backwards
             path.Insert(0,current.Tile); 
-            current = current.CameFrom;
+            current = current.CameFrom; 
         }
         return path;
     }
