@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerThing : WorldThing
 {
+    
     public bool HasKey = false;
-
+    
     protected override void OnStart()
     {
         base.OnStart();
@@ -14,22 +17,44 @@ public class PlayerThing : WorldThing
     protected override void OnUpdate()
     {
         base.OnUpdate();
-        //If I hit an arrow key, move in that direction
-        if (IM.Pressed(Inputs.Left))
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            Move(-1,0);
+            TileThing door = God.GSM.GetThings(Types.MagicDoor)[0].Location;
+            if (door == Location)
+                SceneManager.LoadScene("Game");
+            else
+                God.GSM.StartCoroutine(WalkToTarget(door));
         }
-        else if (IM.Pressed(Inputs.Right))
+    }
+
+    public IEnumerator WalkToTarget(TileThing targ)
+    {
+        //First, we find a path...
+        List<TileThing> path = Pathfinder.Pathfind(Location,targ);
+        
+        Debug.Log("PATH: " + path.Count);
+        if (!path.Contains(targ))
         {
-            Move(1,0);
+            God.GSM.SetText("COULDN'T FIND EXIT");
+            yield break;
         }
-        else if (IM.Pressed(Inputs.Up))
+
+        float walkSpeed = 0.2f;
+        //If it's a real long path speed up your walking a bit...
+        for (int n = path.Count / 10; n > 0; n--)
+            walkSpeed *= 0.75f;
+        //Then we take it, step by step
+        foreach (TileThing t in path)
         {
-            Move(0,1);
-        }
-        else if (IM.Pressed(Inputs.Down))
-        {
-            Move(0,-1);
+            if (!t.CanEnter() || !Location.Neighbors().Contains(t))
+            {
+                God.GSM.SetText("INVALID MOVE");
+                yield break;
+            }
+            Move(t);
+            if (path.Count - path.IndexOf(t) < 30)
+                walkSpeed = 0.2f;
+            yield return new WaitForSeconds(walkSpeed);
         }
     }
 }

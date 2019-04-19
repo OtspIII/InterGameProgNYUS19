@@ -60,7 +60,6 @@ public class WorldThing : MonoBehaviour
         Location.Contents = this;
         transform.SetParent(Location.transform);
         transform.localPosition = Vector3.zero;
-        Debug.Log("SET LOCATION: " + name + " / " + tile.X + "." + tile.Y);
     }
 
     //When you leave a tile remove yourself from its contents
@@ -73,10 +72,9 @@ public class WorldThing : MonoBehaviour
 
     //When the player (or something else) tries to enter a square containing this, run this function
     //The return bool is whether you let the player enter or not. On a true the player can enter, on a false they can't
-    public virtual IEnumerator GetBumped(WorldThing bumper)
+    public virtual void GetBumped(WorldThing bumper)
     {
         //By default let's just say that if you try to enter this square nothing happens and you can't get in
-        yield return null;
     }
 
     //Move to a position relative to your current location
@@ -93,26 +91,14 @@ public class WorldThing : MonoBehaviour
         if (target == null)
             return;
         if (target.Contents != null)
-            StartCoroutine(PlayAnim(target.Contents.GetBumped(this)));
+            target.Contents.GetBumped(this);
         else
-            StartCoroutine(PlayAnim(Walk(target)));
+            SetLocation(target);
     }
 
-    public IEnumerator PlayAnim(IEnumerator coroutine)
+    public virtual bool CanEnter()
     {
-        IM.CanAct = false;
-        yield return StartCoroutine(coroutine);
-        IM.CanAct = true;
-    }
-    
-    public IEnumerator Walk(TileThing target)
-    {
-        while (Vector3.Distance(transform.position, target.transform.position) > 0.05f)
-        {
-            transform.position = Vector3.Lerp(transform.position,target.transform.position,0.3f);
-            yield return null;
-        }
-        SetLocation(target);
+        return false;
     }
 
     public enum Types

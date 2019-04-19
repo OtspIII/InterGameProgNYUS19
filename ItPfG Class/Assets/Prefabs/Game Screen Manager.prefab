@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3561553576065437106
 RectTransform:
   m_ObjectHideFlags: 0
@@ -254,7 +254,6 @@ MonoBehaviour:
   Cam: {fileID: 7384187159706799434}
   Text: {fileID: 7384187159806847531}
   ScoreTxt: {fileID: 284810070467385146}
-  Score: 0
   AllThings: []
   AllTiles: []
 --- !u!1 &7384187159706799540
@@ -360,7 +359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7384187159806847508
 RectTransform:
   m_ObjectHideFlags: 0

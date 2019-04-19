@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 public class TileThing : MonoBehaviour
@@ -29,5 +30,37 @@ public class TileThing : MonoBehaviour
         return God.GSM.GetTile(X + x,Y + y);
     }
     
-    
+    public List<TileThing> Neighbors()
+    {
+        List<TileThing> r = new List<TileThing>();
+        List<Point> dirs = new List<Point>(){new Point(1,0),new Point(-1,0),new Point(0,1),new Point(0,-1)};
+        foreach (Point d in dirs)
+        {
+            TileThing t = Neighbor(d.X, d.Y);
+            if (t != null)
+                r.Add(t);
+        }
+        return r;
+    }
+
+    public bool CanEnter()
+    {
+        if (Contents == null)
+            return true;
+        return Contents.CanEnter();
+    }
+
+    private void OnMouseDown()
+    {
+        if (Contents != null)
+        {
+            if (Contents.Type == WorldThing.Types.Wall || Contents.Type == WorldThing.Types.Skeleton)
+                Contents.LeaveTile(this);
+            return;
+        }
+        if (Random.Range(0,100f) >= 1)
+            God.Library.SpawnThing(WorldThing.Types.Wall, this);
+        else
+            God.Library.SpawnThing(WorldThing.Types.Skeleton, this);
+    }
 }

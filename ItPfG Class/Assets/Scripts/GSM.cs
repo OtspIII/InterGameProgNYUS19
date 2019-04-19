@@ -44,16 +44,19 @@ public class GSM : MonoBehaviour
             }
         }
 
-        List<TileThing> openTiles = new List<TileThing>();
-        openTiles.AddRange(AllTiles);
-        foreach (WorldThing.Types t in GameSettings.MapContents)
-        {
-            if (openTiles.Count == 0)
-                break;
-            TileThing rand = openTiles[Random.Range(0, openTiles.Count)];
-            openTiles.Remove(rand);
-            God.Library.SpawnThing(t, rand);
-        }
+        God.Library.SpawnThing(WorldThing.Types.Player, GetTile(-4,0));
+        God.Library.SpawnThing(WorldThing.Types.MagicDoor, GetTile(4,0));
+        
+//        List<TileThing> openTiles = new List<TileThing>();
+//        openTiles.AddRange(AllTiles);
+//        foreach (WorldThing.Types t in GameSettings.MapContents)
+//        {
+//            if (openTiles.Count == 0)
+//                break;
+//            TileThing rand = openTiles[Random.Range(0, openTiles.Count)];
+//            openTiles.Remove(rand);
+//            God.Library.SpawnThing(t, rand);
+//        }
     }
     
     //I can update the big screen covering text with this
